@@ -8,9 +8,6 @@ Short description or tagline about your project.
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-- [API Documentation](#api-documentation)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 
@@ -28,8 +25,6 @@ This application is designed to provide a robust and scalable RESTful API using 
 
 ## Installation
 
-Provide instructions on how to install and set up your project locally. Include any prerequisites, such as software, tools, or environment variables.
-
 ```bash
 # Clone the repository
 git clone https://github.com/TomasBodas/restfulAPI_Bodas.git
@@ -39,3 +34,72 @@ cd restfulAPI_Bodas
 
 # Install dependencies
 npm install
+```
+
+## Usage
+
+To use the User Management RESTful API, follow these steps:
+
+1. **Database Setup:** Install database.sql in your postgresql installation. Pool details are in db.ts, change if needed.
+
+2. **Start the Server:** Launch the API server.
+
+    ```bash
+    npm run dev
+    ```
+
+3. **API Endpoints:** Use tools like `curl`, Postman, or any API client to interact with the endpoints. Below are examples of how to use the CRUD operations:
+
+   - **Create User:**
+
+     ```http
+     POST /user
+     Content-Type: application/json
+
+     {
+       "name": "John Doe",
+       "email": "john@example.com",
+       "password": "secretpassword"
+     }
+     ```
+
+   - **Login:**
+
+     ```http
+     POST /login
+     Content-Type: application/json
+
+     {
+       "name": "John Doe",
+       "password": "secretpasswordHASH"
+     }
+     ```
+
+   - **Get All Users:**
+
+     ```http
+     GET /users
+     ```
+
+   - **Get User by ID:**
+
+     ```http
+     GET /users/:id
+     ```
+
+   - **Update User:**
+
+     ```http
+     PUT /users/:id
+     Content-Type: application/json
+
+     {
+       "name": "Updated Name"
+     }
+     ```
+
+   - **Delete User:**
+
+     ```http
+     DELETE /users/:id
+     ```
