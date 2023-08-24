@@ -4,10 +4,10 @@ import pool from "../db";
 
 const { PRIVATE_KEY } = process.env;
 
-// Interface representing the User object
+// Interface representing a User object
 interface User {
-  password(password: string): void;
   user_id: number;
+  password(password: string): void;
 }
 
 // Interface for defining the SET clauses in the update query
@@ -19,7 +19,7 @@ interface SetClause {
 export default class UserService {
   // Generates a JWT token for a given user
   static generateToken(user: User): string {
-    return jwt.sign({ userId: user.user_id }, PRIVATE_KEY as unknown as string, { expiresIn: "1h" });
+    return jwt.sign({ userId: user.user_id }, PRIVATE_KEY as string, { expiresIn: "1h" });
   }
 
   // Creates a new user and stores them in the database
@@ -92,7 +92,6 @@ export default class UserService {
     await pool.query(queryString, values);
     return "User was updated!";
   }
-  
 
   // Deletes a user from the database
   static async deleteUser(id: number): Promise<void> {

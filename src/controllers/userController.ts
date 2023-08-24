@@ -37,16 +37,11 @@ const loginUserSchema = Joi.object({
 // Handler to create a new user
 const createUser = async (req: CreateUserRequest, res: Response) => {
   try {
+    // Validate the request body
     const { error } = createUserSchema.validate(req.body, { abortEarly: false });
-    console.log('error', error);
-
     if (error) {
-      // Handle validation errors
-      if (error.details) {
-        const missingFields = error.details.map(detail => detail.context?.key).filter(Boolean);
-        return res.status(400).json({ missingFields: missingFields });
-      }
-      return res.status(400).json({ message: "Validation error occurred." });
+      const missingFields = error.details.map(detail => detail.context?.key).filter(Boolean);
+      return res.status(400).json({ missingFields: missingFields });
     }
 
     const { name, email, password } = req.body;
@@ -61,8 +56,8 @@ const createUser = async (req: CreateUserRequest, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await userService.createUser(name, email, hashedPassword);
     res.json(newUser);
-  } catch (err) {
-    console.error((err as Error).message);
+  } catch (err: any) {
+    console.error(err.message);
     res.status(500).json("An error occurred.");
   }
 };
@@ -70,10 +65,9 @@ const createUser = async (req: CreateUserRequest, res: Response) => {
 // Handler for user login
 const loginUser = async (req: LoginUserRequest, res: Response) => {
   try {
+    // Validate the login request body
     const { error } = loginUserSchema.validate(req.body);
-
     if (error) {
-      // Handle login validation errors
       const missingFields = error.details.map(detail => detail.context?.key).filter(Boolean);
       return res.status(400).json({ missingFields: missingFields });
     }
@@ -82,23 +76,15 @@ const loginUser = async (req: LoginUserRequest, res: Response) => {
     const user = await userService.getUserByEmail(email);
 
     // Check if user exists and password is correct
-    if (!user) {
-      return res.status(401).json("Invalid credentials.");
-    }
-
-    const passwordMatch = bcrypt.compare(password, user.password as unknown as string);
-    if (!passwordMatch) {
+    if (!user || !await bcrypt.compare(password, user.password as unknown as string)) {
       return res.status(401).json("Invalid credentials.");
     }
 
     // Generate a JWT token for authentication
-    const token = jwt.sign({ userId: user.user_id }, PRIVATE_KEY as unknown as string, {
-      expiresIn: "1h",
-    });
-    console.log(PRIVATE_KEY);
+    const token = jwt.sign({ userId: user.user_id }, PRIVATE_KEY as string, { expiresIn: "1h" });
     res.json({ token });
-  } catch (err) {
-    console.error(err);
+  } catch (err: any) {
+    console.error(err.message);
     res.status(500).json("An error occurred.");
   }
 };

@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 
+// Postresql credentials
 const pool = new Pool({
   user: "postgres",
   password: "rodolfo",
