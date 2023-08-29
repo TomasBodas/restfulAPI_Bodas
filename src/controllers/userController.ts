@@ -1,10 +1,11 @@
+require("dotenv").config();
 import { Request, Response } from "express";
 import Joi from "joi";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userService from "../services/userService";
 
-const { PRIVATE_KEY } = process.env;
+const { PRIVATE_KEY }  = process.env;
 
 // Interfaces for request bodies
 interface CreateUserRequest extends Request {
@@ -76,12 +77,17 @@ const loginUser = async (req: LoginUserRequest, res: Response) => {
     const user = await userService.getUserByEmail(email);
 
     // Check if user exists and password is correct
-    if (!user || !await bcrypt.compare(password, user.password as unknown as string)) {
+    if (!user) {
+      return res.status(401).json("Invalid credentials.");
+    }
+
+    const passwordMatch = bcrypt.compare(password, user.password as unknown as string);
+    if (!passwordMatch) {
       return res.status(401).json("Invalid credentials.");
     }
 
     // Generate a JWT token for authentication
-    const token = jwt.sign({ userId: user.user_id }, PRIVATE_KEY as string, { expiresIn: "1h" });
+    const token = jwt.sign({ userId: user.id }, PRIVATE_KEY as string, { expiresIn: "1h" });
     res.json({ token });
   } catch (err: any) {
     console.error(err.message);
